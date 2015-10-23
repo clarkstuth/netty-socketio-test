@@ -6,6 +6,7 @@
         <title><g:layoutTitle default="Grails"/></title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
         <g:layoutHead/>
     </head>
     <body>

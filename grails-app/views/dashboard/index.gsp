@@ -14,9 +14,9 @@
 
 <body>
 
-<h1>Files Not Started</h1>
+<h1>Files Queued</h1>
 
-<ul id="not-started">
+<ul id="queued">
     <% files.each { file -> %>
     <li id="<%="file_${file.id}"%>">
         <%="${file.file} - ${file.time}"%>
@@ -24,8 +24,8 @@
     <% } %>
 </ul>
 
-<h1>Files Actively Running</h1>
-<ul id="running"></ul>
+<h1>Files Processing</h1>
+<ul id="processing"></ul>
 
 <h1>Files Complete</h1>
 <ul id="complete"></ul>

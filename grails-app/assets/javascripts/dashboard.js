@@ -2,29 +2,30 @@ var files = null;
 
 $(document).ready(function () {
     files = {
-        waiting: $("#not-started"),
-        running: $("#running"),
+        queued: $("#queued"),
+        processing: $("#processing"),
         complete: $("#complete")
     };
 
-    setTimeout(function () {
-        alert("test");
-        addFile("4", "some/new/file/type.txt", "10-23-2015 2:45:PM", files.waiting);
-        clearFileStatus(createFileHtmlId(2));
-    }, 2000); // 2000 is 2 seconds...
+    var socket = io("http://localhost:9092");
+
+    socket.on('fileProcessing', function (data) {
+        handleFileUpdate(data.id, data.file, data.time, files.processing);
+    });
+
+    socket.on('fileCompleted', function (data) {
+        handleFileUpdate(data.id, data.file, data.time, files.complete);
+    });
+
+    socket.on('fileQueued', function (data) {
+        handleFileUpdate(data.id, data.file, data.time, files.queued);
+    });
 
 });
 
-function addFile(id, file, time, listSelector) {
-    var htmlId = createFileHtmlId(id);
+function handleFileUpdate(id, file, time, listSelector) {
+    var htmlId = "file_" + id;
+    $("#" + htmlId).remove();
     var html = "<li id=\"" + htmlId + "\">" + file + " - " + time;
     listSelector.append(html);
-}
-
-function createFileHtmlId(id) {
-    return "file_" + id
-}
-
-function clearFileStatus(fileId) {
-    $("#" + fileId).remove();
 }
