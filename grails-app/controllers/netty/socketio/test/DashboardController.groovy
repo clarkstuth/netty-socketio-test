@@ -1,6 +1,7 @@
 package netty.socketio.test
 
 class DashboardController {
+
     def index() {
 
         response.setHeader("Access-Control-Allow-Origin", "*")

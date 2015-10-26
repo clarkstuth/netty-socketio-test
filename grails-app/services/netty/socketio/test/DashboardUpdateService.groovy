@@ -4,27 +4,34 @@ import com.corundumstudio.socketio.Configuration
 import com.corundumstudio.socketio.SocketIOClient
 import com.corundumstudio.socketio.SocketIOServer
 import com.corundumstudio.socketio.listener.ConnectListener
+import org.springframework.beans.factory.DisposableBean
 
-class DashboardUpdateServer {
+class DashboardUpdateService implements DisposableBean {
 
-    static SocketIOServer createServer() {
+    def transactional = false
 
-        final Configuration config = new Configuration()
+    SocketIOServer server
 
+    void start() {
+
+        def config = new Configuration()
+        config.setOrigin("http://localhost:8080")
         config.setHostname("localhost")
         config.setPort(9092)
-        config.setOrigin("http://localhost:8080");
 
-        final SocketIOServer server = new SocketIOServer(config)
+        server = new SocketIOServer(config)
 
         server.addConnectListener(new ConnectListener() {
             @Override
             public void onConnect(SocketIOClient client) {
+                sendTempUpdates(client)
+            }
 
+            private void sendTempUpdates(SocketIOClient client) {
                 def max = 7
 
                 for (num in (1..(max + 2))) {
-                    def time = new Date().format("m-d-Y H:m")
+                    def time = new Date().format("MM-dd-yyyy H:m")
                     def currentFile = [id: num, file: "/some/file/" + num + ".txt", time: time]
 
                     if (num <= max) {
@@ -56,6 +63,12 @@ class DashboardUpdateServer {
             }
         })
 
-        server
+        server.start()
     }
+
+    @Override
+    void destroy() throws Exception {
+        server.stop()
+    }
+
 }
