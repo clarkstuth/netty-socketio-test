@@ -6,7 +6,7 @@ buildscript {
         mavenLocal()
         maven { url "https://repo.grails.org/grails/core" }
     }
-    dependencies {        
+    dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath 'com.bertramlabs.plugins:asset-pipeline-gradle:2.5.0'
         classpath "org.grails.plugins:hibernate:4.3.10.5"
@@ -41,6 +41,8 @@ assets {
 repositories {
     mavenLocal()
     maven { url "https://repo.grails.org/grails/core" }
+    maven { url "http://resolver/all" }
+    maven { url "http://dl.bintray.com/grails/plugins" }
 }
 
 dependencyManagement {
@@ -64,6 +66,8 @@ dependencies {
     compile "org.grails.plugins:scaffolding"
 
     compile "com.corundumstudio.socketio:netty-socketio:1.7.7"
+    compile 'org.springframework.amqp:spring-rabbit:1.4.5.RELEASE'
+    compile "org.apache.commons:commons-lang3:3.4"
 
     runtime "org.grails.plugins:asset-pipeline"
 

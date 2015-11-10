@@ -4,13 +4,25 @@ import com.corundumstudio.socketio.Configuration
 import com.corundumstudio.socketio.SocketIOClient
 import com.corundumstudio.socketio.SocketIOServer
 import com.corundumstudio.socketio.listener.ConnectListener
+import groovy.json.JsonSlurper
+import org.apache.commons.lang3.tuple.Pair
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
 import org.springframework.beans.factory.DisposableBean
+
+import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.BlockingQueue
 
 class DashboardUpdateService implements DisposableBean {
 
+    // Grails convention to use any transactional management when interacting with this service
     def transactional = false
 
     SocketIOServer server
+    final BlockingQueue<Pair<String, ReceiptUpdateItem>> dashboardUpdates = new ArrayBlockingQueue<>(50)
+    SimpleMessageListenerContainer listener
+    final JsonSlurper slurper = new JsonSlurper()
+
+    Collection<SocketIOClient> connectedClients;
 
     void start() {
 
@@ -23,11 +35,18 @@ class DashboardUpdateService implements DisposableBean {
 
         server.addConnectListener(new ConnectListener() {
             @Override
-            public void onConnect(SocketIOClient client) {
+            void onConnect(SocketIOClient client) {
+
                 sendTempUpdates(client)
+//                sendUpdatesFromQueue(client)
             }
 
-            private void sendTempUpdates(SocketIOClient client) {
+            void sendUpdatesFromQueue(SocketIOClient client) {
+                def update = dashboardUpdates.take()
+                client.sendEvent(update.key, update.value)
+            }
+
+            void sendTempUpdates(SocketIOClient client) {
                 def max = 7
 
                 for (num in (1..(max + 2))) {
@@ -69,6 +88,12 @@ class DashboardUpdateService implements DisposableBean {
     @Override
     void destroy() throws Exception {
         server.stop()
+    }
+
+    class ReceiptUpdateItem {
+        def rfi
+        def time
+        def file
     }
 
 }

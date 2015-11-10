@@ -8,5 +8,6 @@ class BootStrap {
         dashboardUpdateService.start()
     }
     def destroy = {
+        dashboardUpdateService.destroy()
     }
 }
